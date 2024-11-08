@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Form</title>
+</head>
+<body>
+
+    <form>
+        <table>
+            <tr><H1>Netsweeper Config Generator</tr></H1></tr>
+            <tr>
+                <td><label for="dfe">DFE:</label></td>
+                <td><input type="text" id="dfe" name="dfe" placeholder="123-4567" required title="Please enter a valid DFE number in the format 123-4567" size="8"></td>
+            </tr>
+            <tr>
+                <td><label for="brand">Brand:</label></td>
+                <td><input type="text" id="brand" name="brand" size="35"></td>
+            </tr>
+            <tr>
+                <td><label for="pupilGroup">Pupil Group:</label></td>
+                <td><input type="text" id="pupilGroup" name="pupilGroup" size="35"></td>
+            </tr>
+            <tr>
+                <td><label for="staffGroup">Staff Group:</label></td>
+                <td><input type="text" id="staffGroup" name="staffGroup" size="35"></td>
+            </tr>
+            <tr>
+                <td><label for="pupilLogonGuid">Pupil Logon GUID:</label></td>
+                <td><input type="text" id="pupilLogonGuid" name="pupilLogonGuid" size="35"></td>
+            </tr>
+            <tr>
+                <td><label for="pupilLogoffGuid">Pupil Logoff GUID:</label></td>
+                <td><input type="text" id="pupilLogoffGuid" name="pupilLogoffGuid" size="35"></td>
+            </tr>
+            <tr>
+                <td><label for="staffLogonGuid">Staff Logon GUID:</label></td>
+                <td><input type="text" id="staffLogonGuid" name="staffLogonGuid" size="35"></td>
+            </tr>
+            <tr>
+                <td><label for="staffLogoffGuid">Staff Logoff GUID:</label></td>
+                <td><input type="text" id="staffLogoffGuid" name="staffLogoffGuid" size="35"></td>
+            </tr>
+            <tr></tr>
+                <td><label for="mdm">MDM:</label></td>
+                <td>
+                    <select id="mdm" name="mdm">
+                        <option value="lightspeed">Lightspeed</option>
+                        <option value="intune">InTune</option>
+                        <option value="jamf">JAMF</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="reset" value="Clear Form">
+                    <input type="button" value="Download IOS Config" onclick="downloadPlist()">
+                    <input type="button" value="Download ChromeBook Config" onclick="return validateForm()">
+                </td>
+            </tr>
+        </table>
+    </form>
+    <script>
+    function downloadPlist() {
+        const dfePattern = /^\d{3}-\d{4}$/;
+        const dfe = document.getElementById('dfe').value;
+        const brand = document.getElementById('brand').value;
+        if (/\s/.test(brand)) {
+            alert('Brand name should not contain spaces.');
+            return;
+        }
+        const pupilGroup = document.getElementById('pupilGroup').value;
+        const staffGroup = document.getElementById('staffGroup').value;
+        const mdm = document.getElementById('mdm').value;
+        if (!dfe || !brand || !pupilGroup || !staffGroup || !dfePattern.test(dfe)) {
+            if (!dfePattern.test(dfe)) {
+                alert('Please enter a valid DFE number in the format 123-4567.');
+            } else {
+                alert('Please fill in all required fields.');
+            }
+            return;
+        }
+
+        let MDM;
+        switch (mdm) {
+            case 'intune':
+                MDM = '{{username}}';
+                break;
+            case 'jamf':
+                MDM = '%Name%';
+                break;
+            case 'lightspeed':
+                MDM = '%DeviceName%';
+                break;
+            default:
+                MDM = '';
+        }
+
+        const plistTemplate = `<?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+    <dict>
+        <key>configedit</key>
+        <string>-p filter.wavenetcloud.netsweeper.com:3431 -y ${brand} -f 958209 -n ${MDM} -d ${dfe} -g ${pupilGroup}</string>
+    </dict>
+    </plist>`;
+
+        const staffPlistTemplate = `<?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+    <dict>
+        <key>configedit</key>
+        <string>-p filter.wavenetcloud.netsweeper.com:3431 -y ${brand} -f 958209 -n ${MDM} -d ${dfe} -g ${staffGroup}</string>
+    </dict>
+    </plist>`;
+
+        downloadFile('IOS_pupilConfig.plist', plistTemplate);
+        downloadFile('IOS_staffConfig.plist', staffPlistTemplate);
+    }
+
+    function downloadFile(filename, content) {
+        const element = document.createElement('a');
+        const file = new Blob([content], { type: 'text/xml' });
+        element.href = URL.createObjectURL(file);
+        element.download = filename;
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
+
+    function validateForm() {
+        const dfePattern = /^\d{3}-\d{4}$/;
+        const dfe = document.getElementById('dfe').value;
+        const brand = document.getElementById('brand').value;
+        if (/\s/.test(brand)) {
+            alert('Brand name should not contain spaces.');
+            return;
+        }
+        const pupilLogonGuid = document.getElementById('pupilLogonGuid').value;
+        const pupilLogoffGuid = document.getElementById('pupilLogoffGuid').value;
+        const staffLogonGuid = document.getElementById('staffLogonGuid').value;
+        const staffLogoffGuid = document.getElementById('staffLogoffGuid').value;
+        const guidPattern = /^[a-zA-Z0-9]{32}$/;
+        if (!guidPattern.test(pupilLogonGuid) || !guidPattern.test(pupilLogoffGuid) || !guidPattern.test(staffLogonGuid) || !guidPattern.test(staffLogoffGuid)) {
+            alert('GUIDs must be exactly 32 alphanumeric characters.');
+            return;
+        }
+        if (!dfe || !brand || !pupilGroup || !staffGroup || !dfePattern.test(dfe)) {
+            if (!dfePattern.test(dfe)) {
+                alert('Please enter a valid DFE number in the format 123-4567.');
+            } else {
+                alert('Please fill in all required fields.');
+            }
+            return;
+        }
+
+        const google_wagent_pupilConfig = `{
+      "NS_WAGENT_ARGS": {
+        "Value": "-w wavenetcloud.netsweeper.com -d nsagent-login.netsweeper.com -g ${pupilLogonGuid} -L ${pupilLogoffGuid} -i -l -v"
+      },
+      "NS_WAGENT_SOFTWARENAME": {
+        "Value": "Netsweeper Workstation Agent"
+      }
+    }`;
+
+        const google_wagent_staffConfig = `{
+      "NS_WAGENT_ARGS": {
+        "Value": "-w wavenetcloud.netsweeper.com -d nsagent-login.netsweeper.com -g ${staffLogonGuid} -L ${staffLogoffGuid} -i -l -v"
+      },
+      "NS_WAGENT_SOFTWARENAME": {
+        "Value": "Netsweeper Workstation Agent"
+      }
+    }`;
+
+        const google_clientfilter_pupilConfig = `{
+            "policyserver": {
+                "Value": "filter.wavenetcloud.netsweeper.com:3431"
+            },
+            "makeopts": {
+                "Value": "-y $brand -f 923649 -g $pupilgroup -d $dfe -t 987"
+            },
+            "whitelist": {
+                "Value": ["stylesheet://, 1","script://, 1","image://, 1","font://, 1","object://, 1","ping://, 1","csp_report://, 1","media://, 1","websocket://, 1","other://, 1","filesystem:, 1"]
+            }
+        }`;
+
+        const google_clientfilter_staffConfig = `{
+            "policyserver": {
+                "Value": "filter.wavenetcloud.netsweeper.com:3431"
+            },
+            "makeopts": {
+                "Value": "-y $brand -f 923649 -g $staffgroup -d $dfe -t 987"
+            },
+            "whitelist": {
+                "Value": ["stylesheet://, 1","script://, 1","image://, 1","font://, 1","object://, 1","ping://, 1","csp_report://, 1","media://, 1","websocket://, 1","other://, 1","filesystem:, 1"]
+            }
+        }`;
+
+        downloadFile('Google_wagent_pupilConfig.json', google_wagent_pupilConfig);
+        downloadFile('Google_wagent_staffConfig.json', google_wagent_pupilConfig);
+        downloadFile('Google_clientfilter_pupilConfig.json', google_clientfilter_pupilConfig);
+        downloadFile('Google_clientfilter_staffConfig.json', google_clientfilter_staffConfig);
+        return true;
+    }
+    </script>
+</body>
+</html>
