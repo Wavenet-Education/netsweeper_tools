@@ -197,12 +197,23 @@
             }
         }`;
 
-        downloadFile('Google_wagent_pupilConfig.json', google_wagent_pupilConfig);
-        downloadFile('Google_wagent_staffConfig.json', google_wagent_staffConfig);
-        downloadFile('Google_clientfilter_pupilConfig.json', google_clientfilter_pupilConfig);
-        downloadFile('Google_clientfilter_staffConfig.json', google_clientfilter_staffConfig);
+        downloadFile1('Google_wagent_pupilConfig.json', google_wagent_pupilConfig);
+        downloadFile1('Google_wagent_staffConfig.json', google_wagent_staffConfig);
+        downloadFile1('Google_clientfilter_pupilConfig.json', google_clientfilter_pupilConfig);
+        downloadFile1('Google_clientfilter_staffConfig.json', google_clientfilter_staffConfig);
         return true;
     }
+
+        function downloadFile1(filename, content) {
+        const element = document.createElement('a');
+        const file = new Blob([content], { type: 'text/xml' });
+        element.href = URL.createObjectURL(file);
+        element.download = filename;
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
+
     </script>
 </body>
 </html>
