@@ -197,13 +197,13 @@
             }
         }`;
 
-        downloadFile1('Google_wagent_pupilConfig.json', google_wagent_pupilConfig);
-        downloadFile1('Google_wagent_staffConfig.json', google_wagent_staffConfig);
-        downloadFile1('Google_clientfilter_pupilConfig.json', google_clientfilter_pupilConfig);
-        downloadFile1('Google_clientfilter_staffConfig.json', google_clientfilter_staffConfig);
+        downloadFile('Google_wagent_pupilConfig.json', google_wagent_pupilConfig);
+        downloadFile('Google_wagent_staffConfig.json', google_wagent_staffConfig);
+        downloadFile('Google_clientfilter_pupilConfig.json', google_clientfilter_pupilConfig);
+        downloadFile('Google_clientfilter_staffConfig.json', google_clientfilter_staffConfig);
     }
 
-        function downloadFile1(filename, content) {
+        function downloadFile(filename, content) {
         const element = document.createElement('a');
         const file = new Blob([content], { type: 'application/json' });
         element.href = URL.createObjectURL(file);
