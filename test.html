@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Form</title>
+</head>
+<body>
+
+    <form id="configForm">
+        <table>
+            <tr><td colspan="2"><h1>Netsweeper Config Generator</h1></td></tr>
+            <tr>
+                <td><label for="dfe">DFE:</label></td>
+                <td><input type="text" id="dfe" name="dfe" placeholder="123-4567" required title="Please enter a valid DFE number in the format 123-4567" size="8"></td>
+            </tr>
+            <tr>
+                <td><label for="brand">Brand:</label></td>
+                <td><input type="text" id="brand" name="brand" size="35" required></td>
+            </tr>
+            <tr>
+                <td><label for="pupilGroup">Pupil Group:</label></td>
+                <td><input type="text" id="pupilGroup" name="pupilGroup" size="35" required></td>
+            </tr>
+            <tr>
+                <td><label for="staffGroup">Staff Group:</label></td>
+                <td><input type="text" id="staffGroup" name="staffGroup" size="35" required></td>
+            </tr>
+            <tr>
+                <td><label for="pupilLogonGuid">Pupil Logon GUID:</label></td>
+                <td><input type="text" id="pupilLogonGuid" name="pupilLogonGuid" size="35"></td>
+            </tr>
+            <tr>
+                <td><label for="pupilLogoffGuid">Pupil Logoff GUID:</label></td>
+                <td><input type="text" id="pupilLogoffGuid" name="pupilLogoffGuid" size="35"></td>
+            </tr>
+            <tr>
+                <td><label for="staffLogonGuid">Staff Logon GUID:</label></td>
+                <td><input type="text" id="staffLogonGuid" name="staffLogonGuid" size="35"></td>
+            </tr>
+            <tr>
+                <td><label for="staffLogoffGuid">Staff Logoff GUID:</label></td>
+                <td><input type="text" id="staffLogoffGuid" name="staffLogoffGuid" size="35"></td>
+            </tr>
+            <tr>
+                <td><label for="mdm">MDM:</label></td>
+                <td>
+                    <select id="mdm" name="mdm">
+                        <option value="lightspeed">Lightspeed</option>
+                        <option value="intune">InTune</option>
+                        <option value="jamf">JAMF</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="reset" value="Clear Form">
+                    <input type="submit" value="Download Configs">
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <script>
+    function downloadPlist(event) {
+        event.preventDefault();
+        const dfe = document.getElementById('dfe').value;
+        const brand = document.getElementById('brand').value;
+        const pupilGroup = document.getElementById('pupilGroup').value;
+        const staffGroup = document.getElementById('staffGroup').value;
+        const pupilLogonGuid = document.getElementById('pupilLogonGuid').value;
+        const pupilLogoffGuid = document.getElementById('pupilLogoffGuid').value;
+        const staffLogonGuid = document.getElementById('staffLogonGuid').value;
+        const staffLogoffGuid = document.getElementById('staffLogoffGuid').value;
+        const mdm = document.getElementById('mdm').value;
+
+        let MDM;
+        switch (mdm) {
+            case 'intune':
+                MDM = '{{partialupn}}';
+                break;
+            case 'jamf':
+                MDM = '%Name%';
+                break;
+            case 'lightspeed':
+                MDM = '%DeviceName%';
+                break;
+            default:
+                MDM = '';
+        }
+
+        const plistTemplate = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>configedit</key>
+    <string>-p filter.wavenetcloud.netsweeper.com:3431 -y ${brand} -f 958209 -n ${MDM} -d ${dfe} -g ${pupilGroup}</string>
+</dict>
+</plist>`;
+
+        const staffPlistTemplate = plistTemplate.replace('${pupilGroup}', `${staffGroup}`);
+        const google_wagent_pupilConfig = JSON.stringify({
+            "NS_WAGENT_ARGS": {
+                "Value": `-w wavenetcloud.netsweeper.com -d nsagent-login.netsweeper.com -g ${pupilLogonGuid} -L ${pupilLogoffGuid} -i -l -v`
+            },
+            "NS_WAGENT_SOFTWARENAME": { "Value": "Netsweeper Workstation Agent" }
+        }, null, 4);
+
+        const google_wagent_staffConfig = google_wagent_pupilConfig.replace(`${pupilLogonGuid}`, `${staffLogonGuid}`);
+
+        downloadFile('IOS_pupilConfig.plist', plistTemplate, 'application/xml');
+    }
+    </script>
+</body>
+</html>

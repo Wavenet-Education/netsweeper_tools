@@ -7,24 +7,24 @@
 </head>
 <body>
 
-    <form>
+    <form id="configForm">
         <table>
-            <tr><H1>Netsweeper Config Generator</tr></H1></tr>
+            <tr><td colspan="2"><H1>Netsweeper Config Generator</H1></td></tr>
             <tr>
                 <td><label for="dfe">DFE:</label></td>
                 <td><input type="text" id="dfe" name="dfe" placeholder="123-4567" required title="Please enter a valid DFE number in the format 123-4567" size="8"></td>
             </tr>
             <tr>
                 <td><label for="brand">Brand:</label></td>
-                <td><input type="text" id="brand" name="brand" size="35"></td>
+                <td><input type="text" id="brand" name="brand" size="35" required></td>
             </tr>
             <tr>
                 <td><label for="pupilGroup">Pupil Group:</label></td>
-                <td><input type="text" id="pupilGroup" name="pupilGroup" size="35"></td>
+                <td><input type="text" id="pupilGroup" name="pupilGroup" size="35" required></td>
             </tr>
             <tr>
                 <td><label for="staffGroup">Staff Group:</label></td>
-                <td><input type="text" id="staffGroup" name="staffGroup" size="35"></td>
+                <td><input type="text" id="staffGroup" name="staffGroup" size="35" required></td>
             </tr>
             <tr>
                 <td><label for="pupilLogonGuid">Pupil Logon GUID:</label></td>
@@ -55,32 +55,24 @@
             <tr>
                 <td colspan="2">
                     <input type="reset" value="Clear Form">
-                    <input type="button" value="Download IOS Config" onclick="downloadPlist()">
-                    <input type="button" value="Download ChromeBook Config" onclick="validateForm()">
+                    <input type="submit" value="Download Configs">
                 </td>
             </tr>
         </table>
     </form>
     <script>
-    function downloadPlist() {
-        const dfePattern = /^\d{3}-\d{4}$/;
+
+    function downloadPlist(event) {
+        event.preventDefault();
         const dfe = document.getElementById('dfe').value;
         const brand = document.getElementById('brand').value;
-        if (/\s/.test(brand)) {
-            alert('Brand name should not contain spaces.');
-            return;
-        }
         const pupilGroup = document.getElementById('pupilGroup').value;
         const staffGroup = document.getElementById('staffGroup').value;
+        const pupilLogonGuid = document.getElementById('pupilLogonGuid').value;
+        const pupilLogoffGuid = document.getElementById('pupilLogoffGuid').value;
+        const staffLogonGuid = document.getElementById('staffLogonGuid').value;
+        const staffLogoffGuid = document.getElementById('staffLogoffGuid').value;
         const mdm = document.getElementById('mdm').value;
-        if (!dfe || !brand || !pupilGroup || !staffGroup || !dfePattern.test(dfe)) {
-            if (!dfePattern.test(dfe)) {
-                alert('Please enter a valid DFE number in the format 123-4567.');
-            } else {
-                alert('Please fill in all required fields.');
-            }
-            return;
-        }
 
         let MDM;
         switch (mdm) {
@@ -114,46 +106,6 @@
         <string>-p filter.wavenetcloud.netsweeper.com:3431 -y ${brand} -f 958209 -n ${MDM} -d ${dfe} -g ${staffGroup}</string>
     </dict>
     </plist>`;
-
-        downloadFile('IOS_pupilConfig.plist', plistTemplate);
-        downloadFile('IOS_staffConfig.plist', staffPlistTemplate);
-    }
-
-    function downloadFile(filename, content) {
-        const element = document.createElement('a');
-        const file = new Blob([content], { type: 'text/xml' });
-        element.href = URL.createObjectURL(file);
-        element.download = filename;
-        document.body.appendChild(element);
-        element.click();
-        document.body.removeChild(element);
-    }
-
-    function validateForm() {
-        const dfePattern = /^\d{3}-\d{4}$/;
-        const dfe = document.getElementById('dfe').value;
-        const brand = document.getElementById('brand').value;
-        if (/\s/.test(brand)) {
-            alert('Brand name should not contain spaces.');
-            return;
-        }
-        const pupilLogonGuid = document.getElementById('pupilLogonGuid').value;
-        const pupilLogoffGuid = document.getElementById('pupilLogoffGuid').value;
-        const staffLogonGuid = document.getElementById('staffLogonGuid').value;
-        const staffLogoffGuid = document.getElementById('staffLogoffGuid').value;
-        const guidPattern = /^[a-zA-Z0-9]{32}$/;
-        if (!guidPattern.test(pupilLogonGuid) || !guidPattern.test(pupilLogoffGuid) || !guidPattern.test(staffLogonGuid) || !guidPattern.test(staffLogoffGuid)) {
-            alert('GUIDs must be exactly 32 alphanumeric characters.');
-            return;
-        }
-        if (!dfe || !brand || !pupilGroup || !staffGroup || !dfePattern.test(dfe)) {
-            if (!dfePattern.test(dfe)) {
-                alert('Please enter a valid DFE number in the format 123-4567.');
-            } else {
-                alert('Please fill in all required fields.');
-            }
-            return;
-        }
 
         const google_wagent_pupilConfig = `{
       "NS_WAGENT_ARGS": {
@@ -197,23 +149,25 @@
             }
         }`;
 
-        downloadFile('Google_wagent_pupilConfig.json', google_wagent_pupilConfig);
-        downloadFile('Google_wagent_staffConfig.json', google_wagent_staffConfig);
-        downloadFile('Google_clientfilter_pupilConfig.json', google_clientfilter_pupilConfig);
-        downloadFile('Google_clientfilter_staffConfig.json', google_clientfilter_staffConfig);
+        downloadFile('IOS_pupilConfig.plist', plistTemplate, 'application/xml');
+        downloadFile('IOS_staffConfig.plist', staffPlistTemplate, 'application/xml');
+        downloadFile('Google_wagent_pupilConfig.json', google_wagent_pupilConfig, 'application/json');
+        downloadFile('Google_wagent_staffConfig.json', google_wagent_staffConfig, 'application/json');
+        downloadFile('Google_clientfilter_pupilConfig.json', google_clientfilter_pupilConfig, 'application/json');
+        downloadFile('Google_clientfilter_staffConfig.json', google_clientfilter_staffConfig, 'application/json');
     }
 
-        function downloadFile(filename, content) {
+    function downloadFile(filename, content, mimeType) {
         const element = document.createElement('a');
-        const file = new Blob([content], { type: 'application/json' });
+        const file = new Blob([content], { type: mimeType });
         element.href = URL.createObjectURL(file);
         element.download = filename;
         document.body.appendChild(element);
         element.click();
+        URL.revokeObjectURL(element.href);
         document.body.removeChild(element);
-        return;
     }
-
-    </script>
+document.getElementById('configForm').addEventListener('submit', downloadPlist);
+</script>
 </body>
 </html>
