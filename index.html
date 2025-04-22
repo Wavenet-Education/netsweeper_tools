@@ -49,7 +49,8 @@
                         <option value="lightspeed">Lightspeed</option>
                         <option value="intune">InTune</option>
                         <option value="jamf">JAMF</option>
-                        <option value="mosyle">Mosyle</option>
+                        <option value="mosyle-dn">Mosyle (Device Name)</option>
+                        <option value="mosyle-sn">Mosyle (Serial Number)</option>
                     </select>
                 </td>
             </tr>
@@ -86,8 +87,11 @@
             case 'lightspeed':
                 MDM = '%DeviceName%';
                 break;
-            case 'mosyle':
+            case 'mosyle-dn':
                 MDM = '%DeviceName%';
+                break;
+            case 'mosyle-sn':
+                MDM = '%SerialNumber%';
                 break;
             default:
                 MDM = '';
