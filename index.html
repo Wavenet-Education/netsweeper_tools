@@ -89,6 +89,20 @@
             }
             return;
         }
+        const guidPattern = /^[a-zA-Z0-9]{32}$/;
+        if (!guidPattern.test(pupilLogonGuid) || !guidPattern.test(pupilLogoffGuid) || !guidPattern.test(staffLogonGuid) || !guidPattern.test(staffLogoffGuid)) {
+            alert('GUIDs must be exactly 32 alphanumeric characters.');
+            return;
+        }
+        if (!dfe || !brand || !pupilGroup || !staffGroup || !dfePattern.test(dfe)) {
+            if (!dfePattern.test(dfe)) {
+                alert('Please enter a valid DFE number in the format 123-4567.');
+            } else {
+                alert('Please fill in all required fields.');
+            }
+            return;
+        }
+
 
         let MDM;
         switch (mdm) {
