@@ -67,8 +67,13 @@
 
     function downloadPlist(event) {
         event.preventDefault();
+        const dfePattern = /^\d{3}-\d{4}$/;
         const dfe = document.getElementById('dfe').value;
         const brand = document.getElementById('brand').value;
+        if (/\s/.test(brand)) {
+            alert('Brand name should not contain spaces.');
+            return;
+        }
         const pupilGroup = document.getElementById('pupilGroup').value;
         const staffGroup = document.getElementById('staffGroup').value;
         const pupilLogonGuid = document.getElementById('pupilLogonGuid').value;
@@ -76,6 +81,14 @@
         const staffLogonGuid = document.getElementById('staffLogonGuid').value;
         const staffLogoffGuid = document.getElementById('staffLogoffGuid').value;
         const mdm = document.getElementById('mdm').value;
+        if (!dfe || !brand || !pupilGroup || !staffGroup || !dfePattern.test(dfe)) {
+            if (!dfePattern.test(dfe)) {
+                alert('Please enter a valid DFE number in the format 123-4567.');
+            } else {
+                alert('Please fill in all required fields.');
+            }
+            return;
+        }
 
         let MDM;
         switch (mdm) {
