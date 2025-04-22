@@ -181,11 +181,11 @@
         }`;
 
         downloadFile(`${dfe}_IOS_pupilConfig.plist`, plistTemplate, 'application/xml');
-        downloadFile('IOS_staffConfig.plist', staffPlistTemplate, 'application/xml');
-        downloadFile('Google_wagent_pupilConfig.json', google_wagent_pupilConfig, 'application/json');
-        downloadFile('Google_wagent_staffConfig.json', google_wagent_staffConfig, 'application/json');
-        downloadFile('Google_clientfilter_pupilConfig.json', google_clientfilter_pupilConfig, 'application/json');
-        downloadFile('Google_clientfilter_staffConfig.json', google_clientfilter_staffConfig, 'application/json');
+        downloadFile(`${dfe}_IOS_staffConfig.plist`, staffPlistTemplate, 'application/xml');
+        downloadFile(`${dfe}_Google_wagent_pupilConfig.json`, google_wagent_pupilConfig, 'application/json');
+        downloadFile(`${dfe}_Google_wagent_staffConfig.json`, google_wagent_staffConfig, 'application/json');
+        downloadFile(`${dfe}_Google_clientfilter_pupilConfig.json`, google_clientfilter_pupilConfig, 'application/json');
+        downloadFile(`${dfe}_Google_clientfilter_staffConfig.json`, google_clientfilter_staffConfig, 'application/json');
     }
 
     function downloadFile(filename, content, mimeType) {
