@@ -180,7 +180,7 @@
             }
         }`;
 
-        downloadFile('IOS_pupilConfig.plist', plistTemplate, 'application/xml');
+        downloadFile('${dfe}_IOS_pupilConfig.plist', plistTemplate, 'application/xml');
         downloadFile('IOS_staffConfig.plist', staffPlistTemplate, 'application/xml');
         downloadFile('Google_wagent_pupilConfig.json', google_wagent_pupilConfig, 'application/json');
         downloadFile('Google_wagent_staffConfig.json', google_wagent_staffConfig, 'application/json');
