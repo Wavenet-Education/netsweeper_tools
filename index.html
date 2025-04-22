@@ -47,7 +47,8 @@
                 <td>
                     <select id="mdm" name="mdm">
                         <option value="lightspeed">Lightspeed</option>
-                        <option value="intune">InTune</option>
+                        <option value="intune-ur">InTune (User Registered)</option>
+                        <option value="intune-dr">InTune (Device Register)</option>
                         <option value="jamf">JAMF</option>
                         <option value="mosyle-dn">Mosyle (Device Name)</option>
                         <option value="mosyle-sn">Mosyle (Serial Number)</option>
@@ -78,8 +79,11 @@
 
         let MDM;
         switch (mdm) {
-            case 'intune':
+            case 'intune-ur':
                 MDM = '{{username}}';
+                break;
+            case 'intune-dr':
+                MDM = '{{serialnumber}}';
                 break;
             case 'jamf':
                 MDM = '%Name%';
