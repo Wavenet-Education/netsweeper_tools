@@ -49,7 +49,7 @@
                         <option value="lightspeed">Lightspeed</option>
                         <option value="intune">InTune</option>
                         <option value="jamf">JAMF</option>
-                        <option value="jamf">Moysle</option>
+                        <option value="mosyle">Mosyle</option>
                     </select>
                 </td>
             </tr>
@@ -84,6 +84,9 @@
                 MDM = '%Name%';
                 break;
             case 'lightspeed':
+                MDM = '%DeviceName%';
+                break;
+            case 'mosyle':
                 MDM = '%DeviceName%';
                 break;
             default:
