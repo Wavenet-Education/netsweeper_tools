@@ -52,6 +52,8 @@
                         <option value="jamf">JAMF</option>
                         <option value="mosyle-dn">Mosyle (Device Name)</option>
                         <option value="mosyle-sn">Mosyle (Serial Number)</option>
+                        <option value="meraki-dn">Meraki (Device Name)</option>
+                        <option value="meraki-sn">Meraki (Serial Number)</option>
                     </select>
                 </td>
             </tr>
@@ -115,6 +117,12 @@
                 break;
             case 'mosyle-sn':
                 MDM = '%SerialNumber%';
+                break;
+            case 'meraki-dn':
+                MDM = '$DEVICENAME';
+                break;
+            case 'meraki-sn':
+                MDM = '$SERIALNUMBER';
                 break;
             default:
                 MDM = '';
