@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netsweeper Configuration Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden">
+        <!-- Header -->
+        <div class="bg-blue-600 p-6 text-white">
+            <h1 class="text-xl font-bold">Netsweeper Configuration Generator</h1>
+            <p class="text-blue-100 text-sm mt-1">Enter details to generate config files</p>
+        </div>
+
+        <!-- Form -->
+        <div class="p-8 space-y-6">
+            
+            <!-- Brand Input -->
+            <div>
+                <label for="brand" class="block text-sm font-medium text-gray-700 mb-1">Brand</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-tag text-gray-400"></i>
+                    </div>
+                    <input type="text" id="brand" 
+                        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out" 
+                        placeholder="e.g. Acme_Corp">
+                </div>
+            </div>
+
+            <!-- DFE Code Input -->
+            <div>
+                <label for="dfeCode" class="block text-sm font-medium text-gray-700 mb-1">DFE Code</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-barcode text-gray-400"></i>
+                    </div>
+                    <input type="text" id="dfeCode" 
+                        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out" 
+                        placeholder="e.g. 123-4567">
+                </div>
+            </div>
+
+            <!-- MST GUIDs Section (Visible if Create MSTs is ticked) -->
+            <div id="mstConfigSection" class="hidden">
+                <div class="border-t border-gray-200 pt-4 mt-4">
+                    <h3 class="text-sm font-semibold text-blue-600 mb-3 uppercase tracking-wide">MST Config</h3>
+                    
+                    <!-- MST Logon GUID Input -->
+                    <div class="mb-4">
+                        <label for="mstLogonGuid" class="block text-sm font-medium text-gray-700 mb-1">Logon GUID</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-key text-gray-400"></i>
+                            </div>
+                            <input type="text" id="mstLogonGuid" 
+                                class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out" 
+                                placeholder="Enter Logon GUID">
+                        </div>
+                    </div>
+
+                    <!-- MST Logoff GUID Input -->
+                    <div>
+                        <label for="mstLogoutGuid" class="block text-sm font-medium text-gray-700 mb-1">Logoff GUID</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-sign-out-alt text-gray-400"></i>
+                            </div>
+                            <input type="text" id="mstLogoutGuid" 
+                                class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out" 
+                                placeholder="Enter Logoff GUID">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MDM Dropdown -->
+            <div class="mt-6">
+                <label for="mdmSelect" class="block text-sm font-medium text-gray-700 mb-1">MDM</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-mobile-alt text-gray-400"></i>
+                    </div>
+                    <select id="mdmSelect" onchange="toggleGroupFields()"
+                        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out appearance-none">
+                        <option value="No MDM">No MDM</option>
+                        <option value="lightspeed">Lightspeed</option>
+                        <option value="intune-user-registered">Intune (User Registered)</option>
+                        <option value="intune-device-registered">Intune (Device Registered)</option>
+                        <option value="jamf">JAMF</option>
+                        <option value="mosyle-device-name">Moysle (Device Name)</option>
+                        <option value="mosyle-serial-number">Moysle (Serial Number)</option>
+                        <option value="meraki-deveice-name">Meraki (Device Name)</option>
+                        <option value="meraki-serial-number">Meraki (Serial Number)</option>
+                    </select>
+                    <!-- Custom dropdown arrow to match style -->
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conditional Group Fields (Hidden by default) -->
+            <div id="groupFields" class="border-t border-gray-200 pt-4 hidden">
+                <h3 class="text-sm font-semibold text-blue-600 mb-3 uppercase tracking-wide">Groups</h3>
+
+                <div class="space-y-6">
+                    <!-- Pupil Group Input -->
+                    <div>
+                        <label for="pupilGroup" class="block text-sm font-medium text-gray-700 mb-1">Pupil Group</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-users text-gray-400"></i>
+                            </div>
+                            <input type="text" id="pupilGroup" 
+                                class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out" 
+                                placeholder="Enter Pupil Group">
+                        </div>
+                    </div>
+
+                    <!-- Staff Group Input -->
+                    <div>
+                        <label for="staffGroup" class="block text-sm font-medium text-gray-700 mb-1">Staff Group</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user-tie text-gray-400"></i>
+                            </div>
+                            <input type="text" id="staffGroup" 
+                                class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out" 
+                                placeholder="Enter Staff Group">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pupil GUIDs Section (Hidden by default) -->
+            <div id="pupilConfigSection" class="border-t border-gray-200 pt-4 hidden">
+                <h3 class="text-sm font-semibold text-blue-600 mb-3 uppercase tracking-wide">Pupil Config</h3>
+                
+                <!-- Chrome / MDM Pupil Logon GUID Input -->
+                <div class="mb-4">
+                    <label for="pupilLogonGuid" class="block text-sm font-medium text-gray-700 mb-1">Chrome Pupil Logon GUID</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-key text-gray-400"></i>
+                        </div>
+                        <input type="text" id="pupilLogonGuid" 
+                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out" 
+                            placeholder="Enter Pupil Logon GUID">
+                    </div>
+                </div>
+
+                <!-- Pupil Logoff GUID Input -->
+                <div>
+                    <label for="pupilLogoutGuid" class="block text-sm font-medium text-gray-700 mb-1">Chrome Pupil Logoff GUID</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-sign-out-alt text-gray-400"></i>
+                        </div>
+                        <input type="text" id="pupilLogoutGuid" 
+                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out" 
+                            placeholder="Enter Pupil Logoff GUID">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Staff GUIDs Section (Hidden by default) -->
+            <div id="staffConfigSection" class="border-t border-gray-200 pt-4 hidden">
+                <h3 class="text-sm font-semibold text-blue-600 mb-3 uppercase tracking-wide">Staff Config</h3>
+                
+                <!-- Chrome / MDM Staff Logon GUID Input -->
+                <div class="mb-4">
+                    <label for="staffLogonGuid" class="block text-sm font-medium text-gray-700 mb-1">Chrome Staff Logon GUID</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-key text-gray-400"></i>
+                        </div>
+                        <input type="text" id="staffLogonGuid" 
+                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out" 
+                            placeholder="Enter Staff Logon GUID">
+                    </div>
+                </div>
+
+                <!-- Staff Logoff GUID Input -->
+                <div>
+                    <label for="staffLogoutGuid" class="block text-sm font-medium text-gray-700 mb-1">Chrome Staff Logoff GUID</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-sign-out-alt text-gray-400"></i>
+                        </div>
+                        <input type="text" id="staffLogoutGuid" 
+                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out" 
+                            placeholder="Enter Staff Logoff GUID">
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-3 pt-2">
+                <!-- Create MST's Checkbox -->
+                <div class="flex items-center">
+                    <input id="createMsts" type="checkbox" onchange="toggleMstFields()" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer">
+                    <label for="createMsts" class="ml-2 block text-sm text-gray-900 cursor-pointer select-none">
+                        Create MST Parameter files
+                    </label>
+                </div>
+
+                <!-- Use UPN Checkbox -->
+                <div class="flex items-center">
+                    <input id="useUpn" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer">
+                    <label for="useUpn" class="ml-2 block text-sm text-gray-900 cursor-pointer select-none">
+                        Use UPN
+                    </label>
+                </div>
+
+                <!-- Enable Driver High Performance Driver Checkbox -->
+                <div class="flex items-center">
+                    <input id="driverHighPerf" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer">
+                    <label for="driverHighPerf" class="ml-2 block text-sm text-gray-900 cursor-pointer select-none">
+                        Enable High Performance Driver
+                    </label>
+                </div>
+
+                <!-- Google Chromebook Checkbox -->
+                <div class="flex items-center">
+                    <input id="googleChromebook" type="checkbox" onchange="toggleGroupFields()" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer">
+                    <label for="googleChromebook" class="ml-2 block text-sm text-gray-900 cursor-pointer select-none">
+                        Google Chromebook
+                    </label>
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <button id="downloadBtn" onclick="generateFiles()" 
+                class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                <i class="fas fa-download mr-2"></i> Download Config Files
+            </button>
+            
+            <!-- Error Message -->
+            <div id="error-message" class="text-center text-sm text-red-600 hidden font-medium"></div>
+
+            <!-- Feedback Message -->
+            <div id="message" class="text-center text-sm text-green-600 hidden">
+                Files downloaded successfully!
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Updated to accept mimeType, defaulting to text/plain
+        function downloadFile(filename, content, mimeType = 'text/plain') {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = url;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function showError(msg) {
+            const errorDiv = document.getElementById('error-message');
+            const successDiv = document.getElementById('message');
+            
+            successDiv.classList.add('hidden'); // Hide success if showing
+            errorDiv.textContent = msg;
+            errorDiv.classList.remove('hidden');
+            
+            // Hide error after 5 seconds
+            setTimeout(() => {
+                errorDiv.classList.add('hidden');
+            }, 5000);
+        }
+
+        function toggleMstFields() {
+            const createMsts = document.getElementById('createMsts');
+            const mstConfigSection = document.getElementById('mstConfigSection');
+
+            if (createMsts.checked) {
+                mstConfigSection.classList.remove('hidden');
+            } else {
+                mstConfigSection.classList.add('hidden');
+            }
+        }
+
+        function toggleGroupFields() {
+            const mdmSelect = document.getElementById('mdmSelect');
+            const googleChromebook = document.getElementById('googleChromebook');
+            const groupFields = document.getElementById('groupFields');
+            const pupilConfigSection = document.getElementById('pupilConfigSection');
+            const staffConfigSection = document.getElementById('staffConfigSection');
+            
+            const isMdmSelected = mdmSelect.value !== 'No MDM';
+            const isChromebookChecked = googleChromebook.checked;
+            
+            // Groups (Pupil/Staff Group) show if MDM OR Chromebook is active
+            if (isMdmSelected || isChromebookChecked) {
+                groupFields.classList.remove('hidden');
+            } else {
+                groupFields.classList.add('hidden');
+            }
+
+            // Chrome GUIDs show ONLY if Chromebook is ticked
+            if (isChromebookChecked) {
+                pupilConfigSection.classList.remove('hidden');
+                staffConfigSection.classList.remove('hidden');
+            } else {
+                pupilConfigSection.classList.add('hidden');
+                staffConfigSection.classList.add('hidden');
+            }
+        }
+
+        function generateFiles() {
+            // 1. Get values from DOM
+            const brand = document.getElementById('brand').value.trim();
+            const dfeCode = document.getElementById('dfeCode').value.trim();
+            
+            // Get MST GUID values
+            const mstLogonGuid = document.getElementById('mstLogonGuid').value.trim();
+            const mstLogoutGuid = document.getElementById('mstLogoutGuid').value.trim();
+
+            // Get Pupil/Staff GUID values
+            const pupilLogonGuid = document.getElementById('pupilLogonGuid').value.trim();
+            const pupilLogoutGuid = document.getElementById('pupilLogoutGuid').value.trim();
+            const staffLogonGuid = document.getElementById('staffLogonGuid').value.trim();
+            const staffLogoutGuid = document.getElementById('staffLogoutGuid').value.trim();
+
+            const mdm = document.getElementById('mdmSelect').value;
+            
+            const createMsts = document.getElementById('createMsts').checked;
+            const useUpn = document.getElementById('useUpn').checked;
+            const driverHighPerf = document.getElementById('driverHighPerf').checked;
+            const googleChromebook = document.getElementById('googleChromebook').checked;
+            
+            const pupilGroup = document.getElementById('pupilGroup').value.trim();
+            const staffGroup = document.getElementById('staffGroup').value.trim();
+
+            const showGroupFields = (mdm !== 'No MDM' || googleChromebook);
+            const showChromeGuids = googleChromebook;
+
+            // --- Validation ---
+            const guidRegex = /^[a-zA-Z0-9]{32}$/;
+            
+            // Brand Validation (No spaces allowed)
+            if (brand.includes(' ')) {
+                showError("Error: Brand Name must not contain spaces.");
+                return;
+            }
+
+            // DFE Code Validation (No spaces allowed)
+            if (dfeCode.includes(' ')) {
+                showError("Error: DFE Code must not contain spaces.");
+                return;
+            }
+
+            // MST Validation
+            if (createMsts) {
+                 if (!guidRegex.test(mstLogonGuid)) {
+                    showError("Error: MST Logon GUID must be exactly 32 alphanumeric characters.");
+                    return;
+                }
+                if (!guidRegex.test(mstLogoutGuid)) {
+                    showError("Error: MST Logoff GUID must be exactly 32 alphanumeric characters.");
+                    return;
+                }
+            }
+
+            // Validate Chrome GUIDs only if Chromebook is selected
+            if (showChromeGuids) {
+                if (!guidRegex.test(pupilLogonGuid)) {
+                    showError("Error: Chrome Pupil Logon GUID must be exactly 32 alphanumeric characters.");
+                    return;
+                }
+                if (!guidRegex.test(pupilLogoutGuid)) {
+                    showError("Error: Chrome Pupil Logoff GUID must be exactly 32 alphanumeric characters.");
+                    return;
+                }
+                if (!guidRegex.test(staffLogonGuid)) {
+                    showError("Error: Chrome Staff Logon GUID must be exactly 32 alphanumeric characters.");
+                    return;
+                }
+                if (!guidRegex.test(staffLogoutGuid)) {
+                    showError("Error: Chrome Staff Logoff GUID must be exactly 32 alphanumeric characters.");
+                    return;
+                }
+            }
+            
+            // Mandatory Group Validation (MDM or Chromebook)
+            if (showGroupFields) {
+                if (!pupilGroup) {
+                    showError("Error: Pupil Group is required when an MDM or Google Chromebook is selected.");
+                    return;
+                }
+                if (!staffGroup) {
+                    showError("Error: Staff Group is required when an MDM or Google Chromebook is selected.");
+                    return;
+                }
+            }
+
+            // Hide any previous errors
+            document.getElementById('error-message').classList.add('hidden');
+
+            
+            // --- Trigger Downloads for Standard Files (If Create MST's is ticked) ---
+            
+            if (createMsts) {
+                // Calculate Flags
+                let flags = 923905;
+                if (useUpn) flags += 65536;
+                if (driverHighPerf) flags += 1048576;
+
+                // Construct content
+                const line1 = `CONFIGEDIT=-p filter.wavenetcloud.netsweeper.com:3431 -y ${brand} -f ${flags} -i nsw -d ${dfeCode} -a ${dfeCode} -A ${dfeCode} -c -s`;
+                const line2 = "NMONITOR_CONFIG=--webadmin=https://wavenetcloud.netsweeper.com/webadmin/ --log=1 --ocr_disabled=0 --ocr_image_compare_disabled=0 --ocr_matched_category_compare=1 --ocr_disable_words_compare=0 --ocr_disable_input_compare=0 --ocr_timeout_recapture=5 --keylog_disabled=0 --keylog_buffer_size=1024 --keylog_timeout_send=1 --keylog_timeout_clear=30 --image_quality=50 --image_target_width=0 --image_target_height=0 --tray_disabled=0 --tray_menu_disabled=0";
+                const line3 = "NUPDATE_ENABLED=1";
+                
+                const nMonitorContent = `${line1}\n${line2}\n${line3}`;
+
+                // --- File 2: wagent-settings.txt ---
+                // Updated to use the new MST GUIDs
+                const wAgentContent = `-w wavenetcloud.netsweeper.com -d nsagent-login.netsweeper.com -s nsw -g ${mstLogonGuid} -L ${mstLogoutGuid} -t 600 -i -l -v -F -S`;
+
+                // Download first file
+                downloadFile('nmonitor-settings.txt', nMonitorContent);
+
+                // Download second file with a slight delay
+                setTimeout(() => {
+                    downloadFile('wagent-settings.txt', wAgentContent);
+                }, 500);
+            }
+
+            // --- MDM Files (IOS Config) ---
+            if (mdm !== 'No MDM') {
+                let MDM_VAR;
+                switch (mdm) {
+                    case 'intune-user-registered':
+                        MDM_VAR = '{{partialupn}}';
+                        break;
+                    case 'intune-device-registered':
+                        MDM_VAR = '{{serialnumber}}';
+                        break;
+                    case 'jamf':
+                        MDM_VAR = '%Name%';
+                        break;
+                    case 'lightspeed':
+                        MDM_VAR = '%DeviceName%';
+                        break;
+                    case 'mosyle-device-name':
+                        MDM_VAR = '%DeviceName%';
+                        break;
+                    case 'mosyle-serial-number':
+                        MDM_VAR = '%SerialNumber%';
+                        break;
+                    case 'meraki-deveice-name':
+                        MDM_VAR = '$DEVICENAME';
+                        break;
+                    case 'meraki-serial-number':
+                        MDM_VAR = '$SERIALNUMBER';
+                        break;
+                    default:
+                        MDM_VAR = '';
+                }
+
+                const dfe = dfeCode; // Map dfeCode to dfe for the template
+
+                const plistTemplate = `<?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+    <dict>
+        <key>configedit</key>
+        <string>-p filter.wavenetcloud.netsweeper.com:3431 -y ${brand} -f 958209 -n ${MDM_VAR} -d ${dfe} -g ${pupilGroup} -a ${dfe} -A ${dfe}</string>
+    </dict>
+    </plist>`;
+
+                const staffPlistTemplate = `<?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+    <dict>
+        <key>configedit</key>
+        <string>-p filter.wavenetcloud.netsweeper.com:3431 -y ${brand} -f 958209 -n ${MDM_VAR} -d ${dfe} -g ${staffGroup} -a ${dfe} -A ${dfe}</string>
+    </dict>
+    </plist>`;
+
+                // Download with slight delays
+                setTimeout(() => downloadFile(`${dfe}_IOS_pupilConfig.plist`, plistTemplate, 'application/xml'), 800);
+                setTimeout(() => downloadFile(`${dfe}_IOS_staffConfig.plist`, staffPlistTemplate, 'application/xml'), 1200);
+            }
+
+            // --- Google Chromebook Files ---
+            if (googleChromebook) {
+                const dfe = dfeCode;
+                
+                const google_wagent_pupilConfig = `{
+      "NS_WAGENT_ARGS": {
+        "Value": "-w wavenetcloud.netsweeper.com -d nsagent-login.netsweeper.com -g ${pupilLogonGuid} -L ${pupilLogoutGuid} -i -l -v"
+      },
+      "NS_WAGENT_SOFTWARENAME": {
+        "Value": "Netsweeper Workstation Agent"
+      }
+    }`;
+
+                const google_wagent_staffConfig = `{
+      "NS_WAGENT_ARGS": {
+        "Value": "-w wavenetcloud.netsweeper.com -d nsagent-login.netsweeper.com -g ${staffLogonGuid} -L ${staffLogoutGuid} -i -l -v"
+      },
+      "NS_WAGENT_SOFTWARENAME": {
+        "Value": "Netsweeper Workstation Agent"
+      }
+    }`;
+
+                const google_clientfilter_pupilConfig = `{
+            "policyserver": {
+                "Value": "filter.wavenetcloud.netsweeper.com:3431"
+            },
+            "makeopts": {
+                "Value": "-y ${brand} -f 923649 -g ${pupilGroup} -d ${dfe} -t 987"
+            },
+            "whitelist": {
+                "Value": ["stylesheet://, 1","script://, 1","image://, 1","font://, 1","object://, 1","ping://, 1","csp_report://, 1","media://, 1","websocket://, 1","other://, 1","filesystem:, 1"]
+            }
+        }`;
+
+                const google_clientfilter_staffConfig = `{
+            "policyserver": {
+                "Value": "filter.wavenetcloud.netsweeper.com:3431"
+            },
+            "makeopts": {
+                "Value": "-y ${brand} -f 923649 -g ${staffGroup} -d ${dfe} -t 987"
+            },
+            "whitelist": {
+                "Value": ["stylesheet://, 1","script://, 1","image://, 1","font://, 1","object://, 1","ping://, 1","csp_report://, 1","media://, 1","websocket://, 1","other://, 1","filesystem:, 1"]
+            }
+        }`;
+
+                // Trigger downloads with increasing delays to ensure browser handles them
+                setTimeout(() => downloadFile(`${dfe}_Google_wagent_pupilConfig.json`, google_wagent_pupilConfig, 'application/json'), 1000);
+                setTimeout(() => downloadFile(`${dfe}_Google_wagent_staffConfig.json`, google_wagent_staffConfig, 'application/json'), 1500);
+                setTimeout(() => downloadFile(`${dfe}_Google_clientfilter_pupilConfig.json`, google_clientfilter_pupilConfig, 'application/json'), 2000);
+                setTimeout(() => downloadFile(`${dfe}_Google_clientfilter_staffConfig.json`, google_clientfilter_staffConfig, 'application/json'), 2500);
+            }
+
+            // Show feedback
+            const msg = document.getElementById('message');
+            msg.classList.remove('hidden');
+            setTimeout(() => {
+                msg.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
