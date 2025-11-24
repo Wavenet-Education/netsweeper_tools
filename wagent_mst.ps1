@@ -127,4 +127,5 @@ finally {
     [System.GC]::Collect()
     [System.GC]::WaitForPendingFinalizers()
     if (Test-Path $absTempMsi) { Remove-Item $absTempMsi -Force -ErrorAction SilentlyContinue }
+
 }
