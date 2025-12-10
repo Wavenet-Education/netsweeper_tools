@@ -446,28 +446,43 @@
                 switch (mdm) {
                     case 'intune-user-registered':
                         MDM_VAR = '{{partialupn}}';
+                        MDM_pupil = pupilGroup;
+                        MDM_staff = staffGroup;
                         break;
                     case 'intune-device-registered':
                         MDM_VAR = '{{serialnumber}}';
+                        MDM_pupil = pupilGroup;
+                        MDM_staff = staffGroup;                        
                         break;
                     case 'jamf':
                         MDM_VAR = '%Name%';
+                        MDM_pupil = pupilGroup;
+                        MDM_staff = staffGroup;
                         break;
                     case 'lightspeed':
                         MDM_VAR = '%device_name%';
+                        MDM_pupil = pupilGroup;
+                        MDM_staff = staffGroup;
                         break;
                     case 'mosyle-device-name':
-                        MDM_VAR = '%DeviceName%@';
-                        MDM_TEST = pupilGroup+'@'+dfeCode;
+                        MDM_VAR = '%DeviceName%';
+                        MDM_pupil = pupilGroup+'@'+dfeCode;
+                        MDM_staff = staffGroup+'@'+dfeCode;
                         break;
                     case 'mosyle-serial-number':
                         MDM_VAR = '%SerialNumber%';
+                        MDM_pupil = pupilGroup+'@'+dfeCode;
+                        MDM_staff = staffGroup+'@'+dfeCode;
                         break;
                     case 'meraki-deveice-name':
                         MDM_VAR = '$DEVICENAME';
+                        MDM_pupil = pupilGroup;
+                        MDM_staff = staffGroup;
                         break;
                     case 'meraki-serial-number':
                         MDM_VAR = '$SERIALNUMBER';
+                        MDM_pupil = pupilGroup;
+                        MDM_staff = staffGroup;
                         break;
                     default:
                         MDM_VAR = '';
@@ -480,7 +495,7 @@
     <plist version="1.0">
     <dict>
         <key>configedit</key>
-        <string>-p filter.wavenetcloud.netsweeper.com:3431 -y ${brand} -f 958209 -n ${MDM_VAR} -d ${dfe} -g ${MDM_TEST} -a ${dfe} -A ${dfe}</string>
+        <string>-p filter.wavenetcloud.netsweeper.com:3431 -y ${brand} -f 958209 -n ${MDM_VAR} -d ${dfe} -g ${MDM_pupil} -a ${dfe} -A ${dfe}</string>
     </dict>
     </plist>`;
 
@@ -489,7 +504,7 @@
     <plist version="1.0">
     <dict>
         <key>configedit</key>
-        <string>-p filter.wavenetcloud.netsweeper.com:3431 -y ${brand} -f 958209 -n ${MDM_VAR} -d ${dfe} -g ${staffGroup} -a ${dfe} -A ${dfe}</string>
+        <string>-p filter.wavenetcloud.netsweeper.com:3431 -y ${brand} -f 958209 -n ${MDM_VAR} -d ${dfe} -g ${MDM_staff} -a ${dfe} -A ${dfe}</string>
     </dict>
     </plist>`;
 
