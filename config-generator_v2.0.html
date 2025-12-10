@@ -457,7 +457,8 @@
                         MDM_VAR = '%device_name%';
                         break;
                     case 'mosyle-device-name':
-                        MDM_VAR = '%DeviceName%@'+dfeCode;
+                        MDM_VAR = '%DeviceName%@';
+                        MDM_TEST = ${pupilGroup}+{dfe}
                         break;
                     case 'mosyle-serial-number':
                         MDM_VAR = '%SerialNumber%';
@@ -479,7 +480,7 @@
     <plist version="1.0">
     <dict>
         <key>configedit</key>
-        <string>-p filter.wavenetcloud.netsweeper.com:3431 -y ${brand} -f 958209 -n ${MDM_VAR} -d ${dfe} -g ${pupilGroup} -a ${dfe} -A ${dfe}</string>
+        <string>-p filter.wavenetcloud.netsweeper.com:3431 -y ${brand} -f 958209 -n ${MDM_VAR} -d ${dfe} -g ${MDM_TEST} -a ${dfe} -A ${dfe}</string>
     </dict>
     </plist>`;
 
