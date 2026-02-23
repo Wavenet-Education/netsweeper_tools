@@ -1,0 +1,284 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Form</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { padding: 8px; width: 300px; }
+        .error { color: red; font-size: 0.8em; display: none; margin-top: 2px; }
+        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>IP Address Configuration</h1>
+    <form id="ipForm">
+        <div class="form-group">
+            <label for="fgModel">FortiGate Model</label>
+            <select id="fgModel" name="fgModel">
+                <option value="FortiGate 30E">FortiGate 30E ** End of Life **</option>
+                <option value="FortiGate 40F" selected>FortiGate 40F</option>
+                <option value="FortiGate 60F">FortiGate 60F</option>
+                <option value="FortiGate 100F">FortiGate 100F</option>
+                <option value="FortiGate 50G">FortiGate 50G</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="wanInterfaceGroup" style="display:none;">
+            <label for="wanInterface">WAN Interface</label>
+            <select id="wanInterface" name="wanInterface">
+                <option value="wan1">wan1</option>
+                <option value="wan2">wan2</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="nsIp">Netsweeper IP Address</label>
+            <input type="text" id="nsIp" name="nsIp" placeholder="Default: 185.222.115.98">
+            <div id="error-nsIp" class="error">Invalid IPv4 address format.</div>
+        </div>
+
+        <div class="form-group">
+            <label for="custExtIp">Customer External IP Address</label>
+            <input type="text" id="custExtIp" name="custExtIp" placeholder="e.g. 203.0.113.1" required>
+            <div id="error-custExtIp" class="error">Invalid IPv4 address format.</div>
+        </div>
+
+        <div class="form-group">
+            <label for="custWanGwIp">Customer WAN Gateway IP Address</label>
+            <input type="text" id="custWanGwIp" name="custWanGwIp" placeholder="Optional (Default: External IP - 1)">
+            <div id="error-custWanGwIp" class="error">Invalid IPv4 address format.</div>
+        </div>
+
+        <div class="form-group">
+            <label for="nsInnerIp">Netsweeper Inner IP Address</label>
+            <input type="text" id="nsInnerIp" name="nsInnerIp" placeholder="e.g. 10.0.0.1" required>
+            <div id="error-nsInnerIp" class="error">Invalid IPv4 address format.</div>
+        </div>
+
+        <div class="form-group">
+            <label for="nsOuterIp">Netsweeper Outer IP Address</label>
+            <input type="text" id="nsOuterIp" name="nsOuterIp" placeholder="e.g. 172.16.0.1" required>
+            <div id="error-nsOuterIp" class="error">Invalid IPv4 address format.</div>
+        </div>
+
+        <button type="submit">Generate Configuration</button>
+        <div style="margin-top: 20px; font-size: 0.9em; color: #333;">
+            <strong>Notice: We assume the following:</strong>
+            <ul>
+                <li>The LAN and WAN are already configured on the Firewall</li>
+                <li>The output of this configuration is checked before using</li>
+                <li>The Firewall rules will need to be re-ordered to apply</li>
+                <li style="color: red; font-weight: bold;">Make sure a backup is taken prior to applying the configuration</li>
+            </ul>
+        </div>
+    </form>
+
+    <script>
+        const fgModel = document.getElementById('fgModel');
+        const wanInterfaceGroup = document.getElementById('wanInterfaceGroup');
+
+        function toggleWanInterface() {
+            wanInterfaceGroup.style.display = (fgModel.value === 'FortiGate 60F' || fgModel.value === 'FortiGate 100F') ? 'block' : 'none';
+        }
+
+        fgModel.addEventListener('change', toggleWanInterface);
+        toggleWanInterface();
+
+        document.getElementById('ipForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const fields = ['custExtIp', 'nsInnerIp', 'nsOuterIp'];
+            const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+            let isValid = true;
+
+            fields.forEach(fieldId => {
+                const input = document.getElementById(fieldId);
+                const errorDiv = document.getElementById('error-' + fieldId);
+                if (!ipv4Regex.test(input.value.trim())) {
+                    errorDiv.style.display = 'block';
+                    isValid = false;
+                } else {
+                    errorDiv.style.display = 'none';
+                }
+            });
+
+            const nsIpInput = document.getElementById('nsIp');
+            if (nsIpInput.value.trim() !== '' && !ipv4Regex.test(nsIpInput.value.trim())) {
+                document.getElementById('error-nsIp').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('error-nsIp').style.display = 'none';
+            }
+
+            const custWanGwIpInput = document.getElementById('custWanGwIp');
+            if (custWanGwIpInput.value.trim() !== '' && !ipv4Regex.test(custWanGwIpInput.value.trim())) {
+                document.getElementById('error-custWanGwIp').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('error-custWanGwIp').style.display = 'none';
+            }
+
+            if (isValid) {
+                const nsIp = document.getElementById('nsIp').value.trim() || '185.222.115.98';
+                const custExtIp = document.getElementById('custExtIp').value.trim();
+                const nsInnerIp = document.getElementById('nsInnerIp').value.trim();
+                const nsOuterIp = document.getElementById('nsOuterIp').value.trim();
+                let custWanGwIp = custWanGwIpInput.value.trim();
+
+                if (!custWanGwIp) {
+                    const parts = custExtIp.split('.');
+                    parts[3] = parseInt(parts[3]) - 1;
+                    custWanGwIp = parts.join('.');
+                }
+
+                let wanInt = 'wan';
+                let lanInt = 'lan';
+                let lanRouterSrc = 'lan';
+                if (document.getElementById('fgModel').value === 'FortiGate 60F' || document.getElementById('fgModel').value === 'FortiGate 100F') {
+                    wanInt = document.getElementById('wanInterface').value;
+                }
+                if (document.getElementById('fgModel').value === 'FortiGate 60F') {
+                    lanInt = 'internal';
+                    lanRouterSrc = 'internal';
+                }
+
+                const content = `config system gre-tunnel
+edit "toNetsweeper"
+set interface ${wanInt}
+set remote-gw ${nsIp}
+set local-gw ${custExtIp}
+next
+end
+
+config system interface
+edit "toNetsweeper"
+set vdom "root"
+set ip ${nsOuterIp} 255.255.255.255
+set allowaccess ping
+set type tunnel
+set remote-ip ${nsInnerIp}  255.255.255.252
+set snmp-index 12
+set interface ${wanInt}
+next
+end
+
+config router static
+    edit 0
+        set priority 2
+        set device "toNetsweeper"
+    next
+end
+
+config router policy
+edit 0
+set input-device "${lanInt}"
+set srcaddr "${lanRouterSrc}"
+set dstaddr "all"
+set protocol 6
+set start-port 443
+set end-port 443
+set gateway ${nsInnerIp}
+set output-device "toNetsweeper"
+next
+edit 0
+set input-device "${lanInt}"
+set srcaddr "${lanRouterSrc}"
+set dstaddr "all"
+set protocol 17
+set start-port 443
+set end-port 443
+set gateway ${nsInnerIp}
+set output-device "toNetsweeper"
+next
+edit 0
+set input-device "${lanInt}"
+set srcaddr "${lanRouterSrc}"
+set dstaddr "all"
+set protocol 6
+set start-port 80
+set end-port 80
+set gateway ${nsInnerIp}
+set output-device "toNetsweeper"
+next
+edit 0
+set input-device "${lanInt}"
+set srcaddr "${lanRouterSrc}"
+set dstaddr "all"
+set protocol 6
+set start-port 3431
+set end-port 3432
+set gateway ${custWanGwIp}
+set output-device "${wanInt}"
+next
+end
+
+config firewall service custom
+    edit "onGuard"
+        set tcp-portrange 3431-3432
+    next
+    edit "quic"
+        set udp-portrange 443 80
+    next
+end
+
+config firewall address
+    edit "filter.wavenetcloud.netsweeper.com"
+        set type fqdn
+        set fqdn "filter.wavenetcloud.netsweeper.com"
+    next
+end
+config firewall policy
+    edit 0
+        set name "deny quic"
+        set srcintf "${lanInt}"
+        set dstintf "${wanInt}"
+        set srcaddr "${lanInt}"
+        set dstaddr "all"
+        set schedule "always"
+        set service "quic"
+        set logtraffic disable
+    next
+    edit 0
+        set name "onGuard"
+        set srcintf "${lanInt}"
+        set dstintf "${wanInt}"
+        set action accept
+        set srcaddr "${lanInt}"
+        set dstaddr "filter.wavenetcloud.netsweeper.com"
+        set schedule "always"
+        set service "onGuard"
+        set logtraffic all
+        set nat enable
+    next
+    edit 0
+        set name "http(s) to netsweeper"
+        set srcintf "${lanInt}"
+        set dstintf "toNetsweeper"
+        set action accept
+        set srcaddr "${lanInt}"
+        set dstaddr "all"
+        set schedule "always"
+        set service "HTTP" "HTTPS"
+        set logtraffic all
+    next
+end`;
+
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                const model = document.getElementById('fgModel').value.split(' ')[1];
+                const date = new Date().toISOString().split('T')[0];
+                link.download = `FG-${model}-${date}.txt`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+        });
+    </script>
+</body>
+</html>
