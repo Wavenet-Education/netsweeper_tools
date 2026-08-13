@@ -418,7 +418,7 @@
                 // Calculate Flags
                 let flags = 923905;
                 if (useUpn) flags += 65536;
-                if (driverHighPerf) flags += 1048576;
+                if (driverHighPerf) flags += 3145728;
 
                 // Construct content
                 const line1 = `CONFIGEDIT=-p filter.wavenetcloud.netsweeper.com:3431 -y ${brand} -f ${flags} -i nsw -d ${dfeCode} -a ${dfeCode} -A ${dfeCode} -c -s`;
