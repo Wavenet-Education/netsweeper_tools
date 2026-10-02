@@ -519,7 +519,7 @@
                 
                 const google_wagent_pupilConfig = `{
       "NS_WAGENT_ARGS": {
-        "Value": "-w wavenetcloud.netsweeper.com -d nsagent-login.netsweeper.com -g ${pupilLogonGuid} -L ${pupilLogoutGuid} -i -l -v"
+        "Value": "-w wavenetcloud.netsweeper.com -d nsagent-login.netsweeper.com -t 600 -g ${pupilLogonGuid} -L ${pupilLogoutGuid} -i -l -v"
       },
       "NS_WAGENT_SOFTWARENAME": {
         "Value": "Netsweeper Workstation Agent"
@@ -528,7 +528,7 @@
 
                 const google_wagent_staffConfig = `{
       "NS_WAGENT_ARGS": {
-        "Value": "-w wavenetcloud.netsweeper.com -d nsagent-login.netsweeper.com -g ${staffLogonGuid} -L ${staffLogoutGuid} -i -l -v"
+        "Value": "-w wavenetcloud.netsweeper.com -d nsagent-login.netsweeper.com -t 600 -g ${staffLogonGuid} -L ${staffLogoutGuid} -i -l -v"
       },
       "NS_WAGENT_SOFTWARENAME": {
         "Value": "Netsweeper Workstation Agent"
